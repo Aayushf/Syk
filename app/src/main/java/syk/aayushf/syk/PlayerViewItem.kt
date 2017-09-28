@@ -9,7 +9,7 @@ import org.jetbrains.anko.find
 /**
  * Created by aayushf on 14/9/17.
  */
-class PlayerViewItem(val p: Player) : AbstractItem<PlayerViewItem, PlayerViewItem.ViewHolder>() {
+class PlayerViewItem(val p:Player): AbstractItem<PlayerViewItem, PlayerViewItem.ViewHolder>() {
     override fun getViewHolder(v: View): ViewHolder {
         return ViewHolder(v)
     }
@@ -27,8 +27,7 @@ class PlayerViewItem(val p: Player) : AbstractItem<PlayerViewItem, PlayerViewIte
         holder.nametv.text = p.name
 
     }
-
-    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         val nametv = itemView.find<TextView>(R.id.nametv)
 
 
