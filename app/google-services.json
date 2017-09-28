@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1040685228888",
+    "firebase_url": "https://sykfirebaseproject.firebaseio.com",
+    "project_id": "sykfirebaseproject",
+    "storage_bucket": "sykfirebaseproject.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1040685228888:android:682b8d72e5fa421a",
+        "android_client_info": {
+          "package_name": "syk.aayushf.syk"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1040685228888-kvsu3j1kp7dvkbnlqus9fkcfbgeondf5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "syk.aayushf.syk",
+            "certificate_hash": "ad5b0694ff17ab02b5eb99a028ef6d44c5cfecd7"
+          }
+        },
+        {
+          "client_id": "1040685228888-sk7jg3bgv9362hkhbb2jnu33kro5kidu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRXRxwN2UjeiUVb8vFQsYLLGKNQ6JXwJY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1040685228888-sk7jg3bgv9362hkhbb2jnu33kro5kidu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
