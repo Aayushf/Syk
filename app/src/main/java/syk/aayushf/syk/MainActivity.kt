@@ -2,42 +2,31 @@ package syk.aayushf.syk
 
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
-import android.support.design.widget.Snackbar
 import android.support.design.widget.TextInputEditText
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.Toolbar
-import android.view.Gravity
-import android.view.View
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Button
-import android.widget.EditText
-import android.widget.LinearLayout
-import org.jetbrains.anko.*
-import org.jetbrains.anko.design.appBarLayout
-import org.jetbrains.anko.design.floatingActionButton
-import org.jetbrains.anko.design.textInputLayout
-import org.jetbrains.anko.design.themedAppBarLayout
-import org.jetbrains.anko.sdk25.coroutines.onClick
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.content_scrolling3.*
-import android.view.View.VISIBLE
+import android.view.View
 import android.view.View.GONE
+import android.view.View.VISIBLE
+import android.widget.EditText
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter
 import com.mikepenz.fastadapter.listeners.ClickEventHook
+import org.jetbrains.anko.*
+import org.jetbrains.anko.design.textInputLayout
 
-class MainActivity : AppCompatActivity(), GameConnection.GameInterface , AnkoLogger, GameConnection.GameStartingInterface{
+class MainActivity : AppCompatActivity(), GameConnection.GameInterface, AnkoLogger, GameConnection.GameStartingInterface {
     override fun showResults(listOfResponses: List<String>, ListOfCounts: List<Int>, listOfAuthors: List<String>) {
         allGone()
         mainrv.visibility = VISIBLE
         fab.onClick {
             gc.addRound()
         }
-        val listOfResultViews : MutableList<ResultViewItem> = MutableList(listOfAuthors.size, {index ->
-            ResultViewItem(ListOfCounts[index].toString(), listOfAuthors[index], listOfResponses[index] )
+        val listOfResultViews: MutableList<ResultViewItem> = MutableList(listOfAuthors.size, { index ->
+            ResultViewItem(ListOfCounts[index].toString(), listOfAuthors[index], listOfResponses[index])
 
 
         })
@@ -51,7 +40,8 @@ class MainActivity : AppCompatActivity(), GameConnection.GameInterface , AnkoLog
         }
 
     }
-    var currentResponse:String? = null
+
+    var currentResponse: String? = null
 
     override fun playerAdded(list: List<Player>) {
         val fadap = FastItemAdapter<PlayerViewItem>()
@@ -72,13 +62,14 @@ class MainActivity : AppCompatActivity(), GameConnection.GameInterface , AnkoLog
         mainrv.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         val fadap = FastItemAdapter<ResponseViewItem>()
         fadap.add(lor.map { ResponseViewItem(it) })
-        fadap.withEventHook(object: ClickEventHook<ResponseViewItem>() {
+        fadap.withEventHook(object : ClickEventHook<ResponseViewItem>() {
             override fun onBind(viewHolder: RecyclerView.ViewHolder): View? {
                 return (viewHolder as ResponseViewItem.ViewHolder).itemVieww
             }
+
             override fun onClick(v: View?, position: Int, fastAdapter: FastAdapter<ResponseViewItem>?, item: ResponseViewItem?) {
 
-                    gc.respond(item!!.r)
+                gc.respond(item!!.r)
 
 
             }
@@ -87,7 +78,8 @@ class MainActivity : AppCompatActivity(), GameConnection.GameInterface , AnkoLog
         mainrv.adapter = fadap
 
     }
-    fun allGone(){
+
+    fun allGone() {
         addercv.visibility = GONE
         mainrv.visibility = GONE
         responsecv.visibility = GONE
@@ -95,8 +87,8 @@ class MainActivity : AppCompatActivity(), GameConnection.GameInterface , AnkoLog
     }
 
 
-    override fun roundAdded(question:String) {
-       allGone()
+    override fun roundAdded(question: String) {
+        allGone()
         responsecv.visibility = VISIBLE
         contenttv.text = question
         titletv.visibility = View.INVISIBLE
@@ -109,10 +101,7 @@ class MainActivity : AppCompatActivity(), GameConnection.GameInterface , AnkoLog
     }
 
 
-
-    
-
-    var gc:GameConnection = GameConnection()
+    var gc: GameConnection = GameConnection()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -147,15 +136,15 @@ class MainActivity : AppCompatActivity(), GameConnection.GameInterface , AnkoLog
 
 
         return if (id == R.id.action_add_question) {
-            alert{
-                customView{
+            alert {
+                customView {
                     title = "Add A Question"
                     verticalLayout {
                         textView {
                             text = "Add #NAME# where the name should come!"
 
                         }
-                        var e:EditText? = null
+                        var e: EditText? = null
                         textInputLayout {
                             e = editText {
                                 hint = "Enter Question Here"
@@ -174,14 +163,14 @@ class MainActivity : AppCompatActivity(), GameConnection.GameInterface , AnkoLog
     }
 
 
-    fun startGame(){
+    fun startGame() {
         alert {
             title = "Player Name"
             customView {
                 val e = editText {
 
                 }
-                positiveButton("Start",{
+                positiveButton("Start", {
                     val p = Player(e.text.toString())
                     gc.createNewGame(p)
                     addGameStarterFrag()
@@ -190,14 +179,15 @@ class MainActivity : AppCompatActivity(), GameConnection.GameInterface , AnkoLog
             }
         }.show()
     }
-    fun joinGame(code:String){
+
+    fun joinGame(code: String) {
         alert {
             title = "Player Name"
             customView {
                 val e = editText {
 
                 }
-                positiveButton("Start",{
+                positiveButton("Start", {
                     val p = Player(e.text.toString())
                     gc.joinGame(p, code)
                     addGameStarterFrag()
@@ -206,7 +196,8 @@ class MainActivity : AppCompatActivity(), GameConnection.GameInterface , AnkoLog
             }
         }.show()
     }
-    fun addGameStarterFrag(){
+
+    fun addGameStarterFrag() {
         allGone()
         mainrv.visibility = VISIBLE
         mainrv.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
@@ -215,11 +206,11 @@ class MainActivity : AppCompatActivity(), GameConnection.GameInterface , AnkoLog
 
 
     }
-    override fun gameStarted(){
+
+    override fun gameStarted() {
         gc.subscribeToGame(this)
 
     }
-
 
 
 }

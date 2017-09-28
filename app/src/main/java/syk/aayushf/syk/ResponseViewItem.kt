@@ -9,7 +9,7 @@ import org.jetbrains.anko.find
 /**
  * Created by aayushf on 24/9/17.
  */
-class ResponseViewItem(val r:String): AbstractItem<ResponseViewItem, ResponseViewItem.ViewHolder>() {
+class ResponseViewItem(val r: String) : AbstractItem<ResponseViewItem, ResponseViewItem.ViewHolder>() {
     override fun getType(): Int {
         return 0
 
@@ -30,7 +30,7 @@ class ResponseViewItem(val r:String): AbstractItem<ResponseViewItem, ResponseVie
 
     }
 
-    class ViewHolder(val itemVieww: View) : RecyclerView.ViewHolder(itemVieww){
+    class ViewHolder(val itemVieww: View) : RecyclerView.ViewHolder(itemVieww) {
         val tvresponse = itemVieww.find<TextView>(R.id.response_tv)
     }
 }

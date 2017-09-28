@@ -1,34 +1,39 @@
 package syk.aayushf.syk
 
-import com.google.firebase.database.*
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
 import java.util.*
-import kotlin.collections.HashMap
 
 /**
  * Created by aayushf on 13/9/17.
  */
-class GameConnection(var id:String = UUID.randomUUID().toString().substring(0,7)):AnkoLogger {
-    var host:Boolean = false
+class GameConnection(var id: String = UUID.randomUUID().toString().substring(0, 7)) : AnkoLogger {
+    var host: Boolean = false
     var myplayer = Player()
     var currentround = 0
     var listofques = listOf<String>()
     var listOfPlayers = listOf<String>()
-    interface GameStartingInterface{
-        fun playerAdded(list:List<Player>)
+
+    interface GameStartingInterface {
+        fun playerAdded(list: List<Player>)
         fun gameStarted()
     }
-    interface GameInterface{
-        fun roundAdded(question:String)
-        fun showResponses(lor:List<String>)
-        fun showResults(listOfResponses:List<String>, ListOfCounts:List<Int>, listOfAuthors:List<String>)
+
+    interface GameInterface {
+        fun roundAdded(question: String)
+        fun showResponses(lor: List<String>)
+        fun showResults(listOfResponses: List<String>, ListOfCounts: List<Int>, listOfAuthors: List<String>)
 
     }
-    var gi:GameInterface? = null
 
-    var gamestarterlistener:GameStartingInterface? = null
-    fun createNewGame(initPlayer: Player){
+    var gi: GameInterface? = null
+
+    var gamestarterlistener: GameStartingInterface? = null
+    fun createNewGame(initPlayer: Player) {
         val fbd = FirebaseDatabase.getInstance()
         val gamesRef = fbd.getReference("games")
         val gameRef = gamesRef.child(id)
@@ -41,13 +46,14 @@ class GameConnection(var id:String = UUID.randomUUID().toString().substring(0,7)
         myplayer = initPlayer
         downloadQuestions()
     }
-    fun joinGame(player:Player, gamecode:String){
+
+    fun joinGame(player: Player, gamecode: String) {
         myplayer = player
         val fbd = FirebaseDatabase.getInstance()
 
         val gamesRef = fbd.getReference("games")
         val gameRef = gamesRef.child(gamecode)
-        gameRef.addListenerForSingleValueEvent(object : ValueEventListener{
+        gameRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError?) {
 
             }
@@ -63,29 +69,30 @@ class GameConnection(var id:String = UUID.randomUUID().toString().substring(0,7)
         info(id)
 
     }
-    fun subscribeToPlayerAddition(act:MainActivity){
+
+    fun subscribeToPlayerAddition(act: MainActivity) {
         gamestarterlistener = act
         val fbd = FirebaseDatabase.getInstance()
         val gameref = fbd.getReference("games").child(id).child("players")
-        gameref.addValueEventListener(object:ValueEventListener{
+        gameref.addValueEventListener(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError?) {
                 TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
             }
 
             override fun onDataChange(p0: DataSnapshot) {
-                val lop:List<Player> = p0.children.map { it.getValue(Player::class.java) }
+                val lop: List<Player> = p0.children.map { it.getValue(Player::class.java) }
                 listOfPlayers = lop.map { it.name }
                 gamestarterlistener!!.playerAdded(lop)
             }
 
         })
-        gameref.addListenerForSingleValueEvent(object:ValueEventListener{
+        gameref.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError?) {
 
             }
 
             override fun onDataChange(p0: DataSnapshot) {
-                val lop:List<Player> = p0.children.map { it.getValue(Player::class.java) }
+                val lop: List<Player> = p0.children.map { it.getValue(Player::class.java) }
                 gamestarterlistener!!.playerAdded(lop)
             }
 
@@ -93,24 +100,26 @@ class GameConnection(var id:String = UUID.randomUUID().toString().substring(0,7)
 
 
     }
-    fun showresultsact(){
+
+    fun showresultsact() {
         val fbd = FirebaseDatabase.getInstance()
-        fbd.getReference("games").child(id).child("rounds").child("curround").child("responses").addListenerForSingleValueEvent(object : ValueEventListener{
+        fbd.getReference("games").child(id).child("rounds").child("curround").child("responses").addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError?) {
 
             }
 
             override fun onDataChange(p0: DataSnapshot) {
-                val listOfResponses:List<String> = p0.children.map { it.child("response").getValue(String::class.java) }
-                val listOfSelections:List<Int> = p0.children.map { it.child("chosenby").childrenCount.toInt() }
-                val listOfAuthors:List<String> = p0.children.map { it.child("author").getValue(String::class.java) }
+                val listOfResponses: List<String> = p0.children.map { it.child("response").getValue(String::class.java) }
+                val listOfSelections: List<Int> = p0.children.map { it.child("chosenby").childrenCount.toInt() }
+                val listOfAuthors: List<String> = p0.children.map { it.child("author").getValue(String::class.java) }
                 gi!!.showResults(listOfResponses, listOfSelections, listOfAuthors)
 
             }
 
         })
     }
-    fun setupGameStartingListener(){
+
+    fun setupGameStartingListener() {
         val fbd = FirebaseDatabase.getInstance()
         val gamesRef = fbd.getReference("games")
         val gameRef = gamesRef.child(id)
@@ -121,7 +130,7 @@ class GameConnection(var id:String = UUID.randomUUID().toString().substring(0,7)
 
             override fun onDataChange(p0: DataSnapshot) {
                 val gamestate = p0.value as String
-                if (gamestate == "STARTED"){
+                if (gamestate == "STARTED") {
                     gamestarterlistener!!.gameStarted()
                 }
 
@@ -130,61 +139,64 @@ class GameConnection(var id:String = UUID.randomUUID().toString().substring(0,7)
         })
 
     }
-    fun downloadQuestions(){
+
+    fun downloadQuestions() {
         val fbd = FirebaseDatabase.getInstance()
         val questionsref = fbd.getReference("questions")
-        questionsref.addListenerForSingleValueEvent(object:ValueEventListener{
+        questionsref.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError?) {
 
             }
 
             override fun onDataChange(p0: DataSnapshot) {
-                listofques = p0.children.map {  it.value as String}
+                listofques = p0.children.map { it.value as String }
             }
 
         })
 
     }
 
-    fun subscribeToGame(act:MainActivity){
+    fun subscribeToGame(act: MainActivity) {
         gi = act
         val fbd = FirebaseDatabase.getInstance()
-        val gamestate = fbd.getReference("games").child(id).child("gamestate").addValueEventListener(object :ValueEventListener{
+        val gamestate = fbd.getReference("games").child(id).child("gamestate").addValueEventListener(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError?) {
 
             }
 
             override fun onDataChange(p0: DataSnapshot) {
-                if (p0.value == "ROUNDADDED"){
+                if (p0.value == "ROUNDADDED") {
                     triggerRoundAdded()
 
-                }else if(p0.value == "RESPONDED"){
+                } else if (p0.value == "RESPONDED") {
                     triggerResponsesAction()
-                }else if (p0.value == "ALLRESPONDED"){
+                } else if (p0.value == "ALLRESPONDED") {
                     showresultsact()
                 }
             }
 
         })
     }
-    fun triggerRoundAdded(){
+
+    fun triggerRoundAdded() {
         val fbd = FirebaseDatabase.getInstance()
-        fbd.getReference("games").child(id).child("rounds").child("curround").child("question").addListenerForSingleValueEvent(object : ValueEventListener{
+        fbd.getReference("games").child(id).child("rounds").child("curround").child("question").addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError?) {
 
             }
 
             override fun onDataChange(p0: DataSnapshot) {
-                if (p0.value!= null){
+                if (p0.value != null) {
                     gi!!.roundAdded(p0.value as String)
                 }
             }
 
         })
     }
-    fun addRound(){
-        if (listofques.isNotEmpty()){
-            if (listOfPlayers.isNotEmpty()){
+
+    fun addRound() {
+        if (listofques.isNotEmpty()) {
+            if (listOfPlayers.isNotEmpty()) {
                 val fbd = FirebaseDatabase.getInstance()
                 fbd.getReference("games").child(id).child("rounds").child("curround").child("question").setValue(generateQuestion())
                 fbd.getReference("games").child(id).child("gamestate").setValue("ROUNDADDED")
@@ -195,45 +207,48 @@ class GameConnection(var id:String = UUID.randomUUID().toString().substring(0,7)
             }
         }
     }
-    fun startGame(){
-        if (host){
+
+    fun startGame() {
+        if (host) {
             addRound()
             val fbd = FirebaseDatabase.getInstance()
             fbd.getReference("games").child(id).child("gamestate").setValue("STARTED")
             subscribeToResponses()
-        }else{
+        } else {
 
         }
     }
-    fun generateQuestion():String{
+
+    fun generateQuestion(): String {
         val rand = Random()
         val radomquestion = listofques[rand.nextInt(listofques.size)]
         val radomplayer = listOfPlayers[rand.nextInt(listOfPlayers.size)]
         val formattedques = radomquestion.replace("#NAME#", radomplayer, false)
         return formattedques
     }
-    fun submitResponse(response:String){
+
+    fun submitResponse(response: String) {
         val fbd = FirebaseDatabase.getInstance()
         fbd.getReference("games").child(id).child("rounds").child("curround").child("responses").child(response).child("response").setValue(response)
         fbd.getReference("games").child(id).child("rounds").child("curround").child("responses").child(response).child("author").setValue(myplayer.name)
 
     }
 
-    fun subscribeToResponses(){
+    fun subscribeToResponses() {
         val fbd = FirebaseDatabase.getInstance()
 
-        fbd.getReference("games").child(id).child("rounds").child("curround").child("responses").addValueEventListener(object:ValueEventListener{
+        fbd.getReference("games").child(id).child("rounds").child("curround").child("responses").addValueEventListener(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError?) {
 
             }
 
             override fun onDataChange(p0: DataSnapshot) {
-                if (p0.children.count() == listOfPlayers.count()){
+                if (p0.children.count() == listOfPlayers.count()) {
                     info("All Players Responded")
                     FirebaseDatabase.getInstance().getReference("games").child(id).child("gamestate").setValue("RESPONDED")
                     triggerResponsesAction()
                     subscribeToSelections()
-                }else{
+                } else {
                     info("response Logged")
                 }
             }
@@ -242,15 +257,16 @@ class GameConnection(var id:String = UUID.randomUUID().toString().substring(0,7)
 
 
     }
-    fun subscribeToSelections(){
+
+    fun subscribeToSelections() {
         val fbd = FirebaseDatabase.getInstance()
-        fbd.getReference("games").child(id).child("rounds").child("curround").child("responded").addValueEventListener(object:ValueEventListener{
+        fbd.getReference("games").child(id).child("rounds").child("curround").child("responded").addValueEventListener(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError?) {
 
             }
 
             override fun onDataChange(p0: DataSnapshot) {
-                if (p0.childrenCount.toInt() == listOfPlayers.count()){
+                if (p0.childrenCount.toInt() == listOfPlayers.count()) {
                     triggerAllRespondedAction()
 
                 }
@@ -259,29 +275,32 @@ class GameConnection(var id:String = UUID.randomUUID().toString().substring(0,7)
 
         })
     }
-    fun triggerAllRespondedAction(){
+
+    fun triggerAllRespondedAction() {
         val fbd = FirebaseDatabase.getInstance()
         fbd.getReference("games").child(id).child("gamestate").setValue("ALLRESPONDED")
     }
-    fun triggerResponsesAction(){
+
+    fun triggerResponsesAction() {
         val fbd = FirebaseDatabase.getInstance()
-        fbd.getReference("games").child(id).child("rounds").child("curround").child("responses").addListenerForSingleValueEvent(object : ValueEventListener{
+        fbd.getReference("games").child(id).child("rounds").child("curround").child("responses").addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError?) {
 
             }
 
             override fun onDataChange(p0: DataSnapshot) {
-                val ListOfResponses = p0.children.map {it.child("response").getValue(String::class.java)  }
+                val ListOfResponses = p0.children.map { it.child("response").getValue(String::class.java) }
                 gi!!.showResponses(ListOfResponses)
             }
 
         })
 
 
-        }
-    fun addQuestionToDatabase(question:String){
+    }
+
+    fun addQuestionToDatabase(question: String) {
         val fbd = FirebaseDatabase.getInstance()
-        val questionsref = fbd.getReference("questions").addListenerForSingleValueEvent(object:ValueEventListener{
+        val questionsref = fbd.getReference("questions").addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError?) {
 
             }
@@ -295,20 +314,12 @@ class GameConnection(var id:String = UUID.randomUUID().toString().substring(0,7)
 
         })
     }
-    fun respond(response:String){
+
+    fun respond(response: String) {
         FirebaseDatabase.getInstance().getReference("games").child(id).child("rounds").child("curround").child("responses").child(response).child("chosenby").child(myplayer.name).setValue(true)
         FirebaseDatabase.getInstance().getReference("games").child(id).child("rounds").child("curround").child("responded").child(myplayer.name).setValue(true)
 
     }
-
-
-
-
-
-
-
-
-
 
 
 }
