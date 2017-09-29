@@ -1,5 +1,6 @@
 package syk.aayushf.syk
 
+import android.content.Context
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.TextInputEditText
@@ -12,6 +13,10 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.EditText
+import co.zsmb.materialdrawerkt.builders.accountHeader
+import co.zsmb.materialdrawerkt.builders.drawer
+import co.zsmb.materialdrawerkt.draweritems.badgeable.primaryItem
+import co.zsmb.materialdrawerkt.draweritems.profile.profile
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter
 import com.mikepenz.fastadapter.listeners.ClickEventHook
@@ -20,6 +25,7 @@ import kotlinx.android.synthetic.main.content_scrolling3.*
 import org.jetbrains.anko.*
 import org.jetbrains.anko.design.textInputLayout
 import org.jetbrains.anko.sdk25.coroutines.onClick
+import java.util.*
 
 class MainActivity : AppCompatActivity(), GameConnection.GameInterface , AnkoLogger, GameConnection.GameStartingInterface{
     override fun showResults(listOfResponses: List<String>, ListOfCounts: List<Int>, listOfAuthors: List<String>) {
@@ -41,6 +47,7 @@ class MainActivity : AppCompatActivity(), GameConnection.GameInterface , AnkoLog
         fab.onClick {
             gc.addRound()
         }
+        setupDrawer()
 
     }
     var currentResponse:String? = null
@@ -121,6 +128,7 @@ class MainActivity : AppCompatActivity(), GameConnection.GameInterface , AnkoLog
         fab_submit_question.onClick {
             gc.addQuestionToDatabase(queset.text.toString())
         }
+        setupDrawer()
 
 
     }
@@ -209,6 +217,31 @@ class MainActivity : AppCompatActivity(), GameConnection.GameInterface , AnkoLog
     }
     override fun gameStarted(){
         gc.subscribeToGame(this)
+
+    }
+    fun setupDrawer(){
+        drawer{
+            accountHeader {
+                profile (getAccount().first, getAccount().second){
+
+                }
+
+            }
+            primaryItem("Change Profile"){
+                onClick { view, position, drawerItem ->
+                    startActivity<ProfileActivity>()
+                    false
+
+                }
+            }
+
+        }
+    }
+    fun getAccount():Pair<String, String>{
+        val sp = getPreferences(Context.MODE_PRIVATE)
+        val name = sp.getString("NAME_PREF", "UnSpecified")
+        val id = sp.getString("ID_PREF", UUID.randomUUID().toString().substring(0,7))
+        return Pair(name, id)
 
     }
 

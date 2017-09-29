@@ -95,4 +95,5 @@
         "when a user tries to pick up one of cards.\n\n"
     </string>
     <string name="title_activity_scrolling3">ScrollingActivity2</string>
+    <string name="title_activity_profile">ProfileActivity</string>
 </resources>
